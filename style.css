@@ -19,7 +19,6 @@
 body {
     background-color: var(--bg-light);
     color: var(--text-dark);
-    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -41,8 +40,9 @@ body {
     border-radius: 10px;
 }
 
-@media (max-width: 768px) {
+
+/* @media (max-width: 768px) {
     .center-content img {
         height: 1000px;
     }
-}
+} */
