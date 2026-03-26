@@ -7,23 +7,41 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alata&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 90vh;
+            flex-direction: column;
+        }
+        
+        .Continue {
+            background-color: #2563eb;
+            color: white;
+            font-size: 50px;
+            padding: 25px 60px;
+            border: none;
+            border-radius: 10px;
+        }
+    </style>
 </head>
 
 <body>
 
     <section id="splash" class="screen active">
         <div class="center-content">
-            <img src="./assets/LOGO.jpeg" alt="">
+            <img width="900px" src="./assets/LOGO.jpeg" alt="">
         </div>
     </section>
 
-    <section onclick="Choice()" id="onboarding" class="screen hidden">
+    <section onclick="login()" id="onboarding" class="screen hidden">
         <button class="Continue">Continue</button>
     </section>
 
     <script>
-        function Choice() {
-            window.location.href = "loginSignupDAshboard.html";
+        function login() {
+            window.location.href = "loginSignupDashboard.html";
         }
     </script>
 
