@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <section id="splash" class="screen active">
+        <div class="center-content">
+            <img src="./assets/LOGO.jpeg" alt="">
+        </div>
+    </section>
+
+    <section onclick="Choice()" id="onboarding" class="screen hidden">
+        <button class="Continue">Continue</button>
+    </section>
+
+    <script>
+        function Choice() {
+            window.location.href = "ChoicePage.html";
+        }
+    </script>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
