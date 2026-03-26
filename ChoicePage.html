@@ -18,10 +18,16 @@
             <h2>Choose your Role</h2>
         </div>
         <div class="choice-buttons">
-            <button class="Con-cr">Continue as CareTaker</button>
-            <button class="Con-p">Continue as Pharmacy</button>
+            <button class="Con-cr" onclick="lsDashboard()">Continue as CareTaker</button>
+            <button class="Con-p" onclick="lsDashboard()">Continue as Pharmacy</button>
         </div>
     </div>
+
+    <script>
+        function lsDashboard() {
+            window.location.href = "loginSignupDashboard.html"
+        }
+    </script>
 </body>
 
 </html>
