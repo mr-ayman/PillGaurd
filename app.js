@@ -1,13 +1,32 @@
 // Firebase Configuration
+import { initializeApp } from "firebase/app";
+
+import { getAnalytics } from "firebase/analytics";
+
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "pillguard-app.firebaseapp.com",
-    projectId: "pillguard-app",
-    storageBucket: "pillguard-app.appspot.com",
-    messagingSenderId: "ID",
-    appId: "APP_ID"
+
+    apiKey: "AIzaSyCmIjp2u3gHt0oJnYKCT06uVpfouvEyTwQ",
+
+    authDomain: "smartmedicinebox-a7732.firebaseapp.com",
+
+    projectId: "smartmedicinebox-a7732",
+
+    storageBucket: "smartmedicinebox-a7732.firebasestorage.app",
+
+    messagingSenderId: "68004712451",
+
+    appId: "1:68004712451:web:1470da33723e7e7b5f7e36",
+
+    measurementId: "G-FE51N7RTWR"
+
 };
 
+
+// Initialize Firebase
+
+const app = initializeApp(firebaseConfig);
+
+const analytics = getAnalytics(app);
 // Initialize Firebase (Assuming Firebase SDK is loaded via CDN)
 // import { initializeApp } from "https://www.gstatic.com/firebasejs/9.x/firebase-app.js";
 // import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.x/firebase-auth.js";
