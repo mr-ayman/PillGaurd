@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Dashboard</title>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+</head>
+
+<body>
+    <h1>Welcome to PillGuard 💊</h1>
+    <button onclick="logout()">Logout</button>
+
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCmIjp2u3gHt0oJnYKCT06uVpfouvEyTwQ",
+            authDomain: "smartmedicinebox-a7732.firebaseapp.com",
+            projectId: "smartmedicinebox-a7732",
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        function logout() {
+            auth.signOut().then(() => {
+                alert("Logged out");
+                window.location.href = "login.html";
+            });
+        }
+    </script>
+</body>
+
+</html>

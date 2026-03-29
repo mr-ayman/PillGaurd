@@ -1,54 +1,76 @@
-// Firebase Configuration
-import { initializeApp } from "firebase/app";
-
-import { getAnalytics } from "firebase/analytics";
-
+// Firebase Config (Keep your existing config)
 const firebaseConfig = {
-
     apiKey: "AIzaSyCmIjp2u3gHt0oJnYKCT06uVpfouvEyTwQ",
-
     authDomain: "smartmedicinebox-a7732.firebaseapp.com",
-
+    databaseURL: "https://smartmedicinebox-a7732-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "smartmedicinebox-a7732",
-
-    storageBucket: "smartmedicinebox-a7732.firebasestorage.app",
-
-    messagingSenderId: "68004712451",
-
-    appId: "1:68004712451:web:1470da33723e7e7b5f7e36",
-
-    measurementId: "G-FE51N7RTWR"
-
 };
 
-
 // Initialize Firebase
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-const app = initializeApp(firebaseConfig);
+let selectedRole = "";
 
-const analytics = getAnalytics(app);
-// Initialize Firebase (Assuming Firebase SDK is loaded via CDN)
-// import { initializeApp } from "https://www.gstatic.com/firebasejs/9.x/firebase-app.js";
-// import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.x/firebase-auth.js";
+// This function is called when a user clicks a role button
+function setRole(role) {
+    // Map the internal name to your Firestore collection names
+    selectedRole = role === 'caretaker' ? 'Caretaker' : 'Pharmacy';
 
-function showScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-    document.getElementById(screenId).classList.remove('hidden');
+    document.getElementById('role-step').classList.add('hidden');
+    document.getElementById('auth-step').classList.remove('hidden');
 }
 
-// Logic for Role-Based Registration
-async function registerUser(email, password, role) {
-    try {
-        // 1. Create User in Auth
-        // 2. Save "role" (Caretaker/Pharmacy) in Firestore under /users/{uid}
-        console.log(`Registering as ${role}`);
-        showScreen('dashboard');
-    } catch (error) {
-        alert(error.message);
-    }
+// ================= SIGNUP =================
+function handleSignup() {
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("pass").value;
+
+    if (!selectedRole) return alert("Please select a role first");
+
+    auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            // Save to the specific collection: Caretaker or Pharmacy
+            return db.collection(selectedRole).doc(user.uid).set({
+                name: name,
+                email: email,
+                role: selectedRole,
+                createdAt: new Date()
+            });
+        })
+        .then(() => {
+            alert("Account Created in " + selectedRole + " ✅");
+            window.location.href = "login.html";
+        })
+        .catch((error) => alert(error.message));
 }
 
-// Splash Screen Timer
-setTimeout(() => {
-    showScreen('onboarding');
-}, 2500);
+// ================= LOGIN =================
+function handleLogin() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("pass").value;
+
+    if (!selectedRole) return alert("Please select a role first");
+
+    auth.signInWithEmailAndPassword(email, password)
+        .then(async(userCredential) => {
+            const user = userCredential.user;
+
+            // Look for the user's UID in the collection matching their selected role
+            const doc = await db.collection(selectedRole).doc(user.uid).get();
+
+            if (doc.exists) {
+                alert("Logged in as " + selectedRole + " ✅");
+                window.location.href = "dashboard.html";
+            } else {
+                alert("Error: You are not registered as a " + selectedRole);
+                auth.signOut(); // Kick them out if they are in the wrong role
+            }
+        })
+        .catch((error) => alert(error.message));
+}

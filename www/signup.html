@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PillGuard | Register</title>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -143,6 +146,52 @@
             document.getElementById('auth-step').classList.remove('hidden');
         }
     </script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCmIjp2u3gHt0oJnYKCT06uVpfouvEyTwQ",
+            authDomain: "smartmedicinebox-a7732.firebaseapp.com",
+            projectId: "smartmedicinebox-a7732",
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let selectedRole = "";
+
+        // store role
+        function setRole(role) {
+            selectedRole = role;
+            document.getElementById('role-step').classList.add('hidden');
+            document.getElementById('auth-step').classList.remove('hidden');
+        }
+
+        // signup
+        function handleSignup() {
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("pass").value;
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+
+                    // save extra data
+                    db.collection("users").doc(user.uid).set({
+                        name: name,
+                        email: email,
+                        role: selectedRole
+                    });
+
+                    alert("Account Created ✅");
+                    window.location.href = "login.html";
+                })
+                .catch((error) => {
+                    alert(error.message);
+                });
+        }
+    </script>
+    <script src="app.js"></script>
 </body>
 
 </html>
