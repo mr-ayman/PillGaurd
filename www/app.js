@@ -1,25 +1,10 @@
-// Firebase Config (Keep your existing config)
-const firebaseConfig = {
-    apiKey: "AIzaSyCmIjp2u3gHt0oJnYKCT06uVpfouvEyTwQ",
-    authDomain: "smartmedicinebox-a7732.firebaseapp.com",
-    databaseURL: "https://smartmedicinebox-a7732-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "smartmedicinebox-a7732",
-};
-
-// Initialize Firebase
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-const auth = firebase.auth();
-const db = firebase.firestore();
+// ... (Keep your Firebase Config and Init)
 
 let selectedRole = "";
 
-// This function is called when a user clicks a role button
 function setRole(role) {
-    // Map the internal name to your Firestore collection names
+    // Match your Firestore Collection names exactly
     selectedRole = role === 'caretaker' ? 'Caretaker' : 'Pharmacy';
-
     document.getElementById('role-step').classList.add('hidden');
     document.getElementById('auth-step').classList.remove('hidden');
 }
@@ -35,66 +20,45 @@ function handleSignup() {
     auth.createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
             const user = userCredential.user;
-            // Save to the specific collection: Caretaker or Pharmacy
+            // Use the SAME field names you plan to query later
             return db.collection(selectedRole).doc(user.uid).set({
                 name: name,
-                email: email,
-                role: selectedRole,
-                createdAt: new Date()
+                email: email, // lowercase
+                role: selectedRole
             });
         })
         .then(() => {
-            alert("Account Created in " + selectedRole + " ✅");
+            alert("Account Created! ✅");
             window.location.href = "login.html";
         })
         .catch((error) => alert(error.message));
 }
 
 // ================= LOGIN =================
-// This variable is set when the user clicks "As a CareTaker" or "As a Pharmacy"
-let selectedRole = "";
-
-function setRole(role) {
-    // Matches your Firestore collection names exactly (Case-sensitive)
-    selectedRole = role === 'caretaker' ? 'Caretaker' : 'Pharmacy';
-
-    document.getElementById('role-step').classList.add('hidden');
-    document.getElementById('auth-step').classList.remove('hidden');
-}
-
 async function handleLogin() {
     const emailInput = document.getElementById("email").value.trim();
     const passInput = document.getElementById("pass").value.trim();
 
-    if (!selectedRole) {
-        alert("Please select a role first.");
-        return;
-    }
+    if (!selectedRole) return alert("Please select a role.");
 
     try {
-        // 1. Reference the specific collection (Caretaker or Pharmacy)
-        // 2. Query where 'Email' and 'Password' match the inputs
-        const userQuery = await db.collection(selectedRole)
-            .where("Email", "==", emailInput)
-            .where("Password", "==", passInput)
-            .get();
+        // 1. Log in via Firebase Auth first (Secure way)
+        const userCredential = await auth.signInWithEmailAndPassword(emailInput, passInput);
+        const user = userCredential.user;
 
-        if (!userQuery.empty) {
-            // Success! We found a matching document
+        // 2. Check if this specific user exists in the SELECTED collection
+        const userDoc = await db.collection(selectedRole).doc(user.uid).get();
+
+        if (userDoc.exists) {
             alert("Login Successful ✅");
-
-            // Optional: Save user info to localStorage to use on the dashboard
-            const userData = userQuery.docs[0].data();
-            localStorage.setItem("userName", userData.name || "User");
-            localStorage.setItem("userRole", selectedRole);
-
+            localStorage.setItem("userName", userDoc.data().name || "User");
             window.location.href = "dashboard.html";
         } else {
-            // No matching document found
-            alert("Invalid Email or Password for " + selectedRole + " ❌");
+            // User exists in Auth, but not in this specific Role collection
+            alert("Error: You do not have " + selectedRole + " permissions.");
+            auth.signOut();
         }
     } catch (error) {
-        console.error("Error logging in: ", error);
-        alert("An error occurred. Please check your Firestore rules.");
+        alert(error.message); // Handles wrong password, user not found, etc.
     }
 }
