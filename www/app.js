@@ -51,26 +51,50 @@ function handleSignup() {
 }
 
 // ================= LOGIN =================
-function handleLogin() {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("pass").value;
+// This variable is set when the user clicks "As a CareTaker" or "As a Pharmacy"
+let selectedRole = "";
 
-    if (!selectedRole) return alert("Please select a role first");
+function setRole(role) {
+    // Matches your Firestore collection names exactly (Case-sensitive)
+    selectedRole = role === 'caretaker' ? 'Caretaker' : 'Pharmacy';
 
-    auth.signInWithEmailAndPassword(email, password)
-        .then(async(userCredential) => {
-            const user = userCredential.user;
+    document.getElementById('role-step').classList.add('hidden');
+    document.getElementById('auth-step').classList.remove('hidden');
+}
 
-            // Look for the user's UID in the collection matching their selected role
-            const doc = await db.collection(selectedRole).doc(user.uid).get();
+async function handleLogin() {
+    const emailInput = document.getElementById("email").value.trim();
+    const passInput = document.getElementById("pass").value.trim();
 
-            if (doc.exists) {
-                alert("Logged in as " + selectedRole + " ✅");
-                window.location.href = "dashboard.html";
-            } else {
-                alert("Error: You are not registered as a " + selectedRole);
-                auth.signOut(); // Kick them out if they are in the wrong role
-            }
-        })
-        .catch((error) => alert(error.message));
+    if (!selectedRole) {
+        alert("Please select a role first.");
+        return;
+    }
+
+    try {
+        // 1. Reference the specific collection (Caretaker or Pharmacy)
+        // 2. Query where 'Email' and 'Password' match the inputs
+        const userQuery = await db.collection(selectedRole)
+            .where("Email", "==", emailInput)
+            .where("Password", "==", passInput)
+            .get();
+
+        if (!userQuery.empty) {
+            // Success! We found a matching document
+            alert("Login Successful ✅");
+
+            // Optional: Save user info to localStorage to use on the dashboard
+            const userData = userQuery.docs[0].data();
+            localStorage.setItem("userName", userData.name || "User");
+            localStorage.setItem("userRole", selectedRole);
+
+            window.location.href = "dashboard.html";
+        } else {
+            // No matching document found
+            alert("Invalid Email or Password for " + selectedRole + " ❌");
+        }
+    } catch (error) {
+        console.error("Error logging in: ", error);
+        alert("An error occurred. Please check your Firestore rules.");
+    }
 }
